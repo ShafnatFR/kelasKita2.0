@@ -15,8 +15,13 @@ return new class extends Migration {
             $table->string('email')->unique();
             $table->string('password');
             $table->enum('role', ['admin', 'mentor', 'student'])->default('student');
+            $table->text('deskripsi');
             $table->string('foto_profil')->nullable();
             $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
+            // perbedaan status:
+            // active: user dapat login dan menggunakan fitur
+            // inactive: user tidak dapat login dan menggunakan fitur permanen
+            // banned: user tidak dapat login dan menggunakan fitur dengan batas waktu tertentu
             $table->timestamps();
         });
     }

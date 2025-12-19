@@ -10,9 +10,10 @@ return new class extends Migration {
         Schema::create('mentors', function (Blueprint $table) {
             $table->id('id_mentor');
             $table->foreignId('id_user')->constrained('users', 'id_user')->onDelete('cascade');
-            $table->string('rekening_bank')->nullable();
-            $table->string('bank_name')->nullable();
+            // $table->string('rekening_bank')->nullable();
+            // $table->string('bank_name')->nullable();
             $table->string('keahlian')->nullable();
+            $table->text('deskripsi_mentor')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
         });
