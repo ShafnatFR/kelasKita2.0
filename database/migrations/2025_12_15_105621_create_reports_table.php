@@ -15,7 +15,7 @@ return new class extends Migration {
 
             $table->string('kategori');
             $table->text('keterangan');
-            $table->enum('status', ['open', 'resolved'])->default('open');
+            $table->enum('status', ['pending', 'in_progress', 'resolved'])->default('pending');
             $table->timestamps();
         });
     }

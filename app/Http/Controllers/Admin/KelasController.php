@@ -46,9 +46,11 @@ class KelasController extends Controller
 
         return view('admin.pages.kelola-kelas.index', compact('kelas', 'kategoriUnik', 'statusUnik'));
     }
+
     public function show($id)
     {
         $kelas = Kelas::with(['mentor.user', 'materi.subMateri'])->findOrFail($id);
+
         return view('admin.pages.kelola-kelas.show', compact('kelas'));
     }
 
@@ -71,7 +73,12 @@ class KelasController extends Controller
         ]);
 
         $kelas = Kelas::findOrFail($id);
-        $kelas->update(['catatan_admin' => $request->catatan_admin]);
+
+        if ($kelas->adminNote) {
+            $kelas->adminNote->update(['content' => $request->catatan_admin]);
+        } else {
+            $kelas->adminNote()->create(['content' => $request->catatan_admin]);
+        }
 
         return back()->with('success', 'Catatan admin berhasil disimpan.');
     }
@@ -79,6 +86,12 @@ class KelasController extends Controller
     public function destroy($id)
     {
         $kelas = Kelas::findOrFail($id);
+
+        // Cek apakah kelas sudah pernah dibeli (ada di tabel transaksi_detail)
+        if ($kelas->transaksiDetails()->exists()) {
+            return back()->with('error', 'Kelas tidak dapat dihapus karena memiliki riwayat transaksi. Silakan ubah status menjadi Archive.');
+        }
+
         $kelas->delete();
 
         return redirect()->route('admin.kelola.kelas')->with('success', 'Kelas berhasil dihapus.');

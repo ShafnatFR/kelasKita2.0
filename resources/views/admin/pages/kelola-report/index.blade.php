@@ -77,16 +77,34 @@
                                 <td class="px-3 py-4 text-sm text-slate-500 max-w-sm truncate">
                                     {{ Str::limit($item->keterangan, 80, '...') }}</td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm">
+                                    @php
+                                        $statusClasses = [
+                                            'resolved' => 'bg-green-50 text-green-700 ring-green-600/20',
+                                            'in_progress' => 'bg-blue-50 text-blue-700 ring-blue-600/20',
+                                            'pending' => 'bg-red-50 text-red-700 ring-red-600/20',
+                                            'open' => 'bg-red-50 text-red-700 ring-red-600/20',
+                                        ];
+                                        $currentStatusClass =
+                                            $statusClasses[$item->status] ?? $statusClasses['pending'];
+                                    @endphp
                                     <span
-                                        class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset {{ $item->status == 'resolved' ? 'bg-green-50 text-green-700 ring-green-600/20' : 'bg-red-50 text-red-700 ring-red-600/20' }}">
-                                        {{ ucfirst($item->status) }}
+                                        class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset {{ $currentStatusClass }}">
+                                        {{ ucfirst(str_replace('_', ' ', $item->status)) }}
                                     </span>
                                 </td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-slate-500">
                                     <div class="flex gap-2">
-                                        <button class="text-blue-600 hover:text-blue-900">Detail</button>
+                                        <a href="{{ route('admin.kelola.report.show', $item->id_report) }}"
+                                            class="text-blue-600 hover:text-blue-900">Detail</a>
                                         @if ($item->status == 'resolved')
-                                            <button class="text-red-600 hover:text-red-900">Hapus</button>
+                                            <form action="{{ route('admin.kelola.report.destroy', $item->id_report) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                    class="text-red-600 hover:text-red-900">Hapus</button>
+                                            </form>
                                         @endif
                                     </div>
                                 </td>

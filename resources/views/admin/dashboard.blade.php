@@ -13,7 +13,7 @@
                 <div class="overflow-hidden rounded-lg bg-white shadow ring-1 ring-slate-900/5">
                     <div class="p-5">
                         <div class="flex items-center">
-                            <div class="flex-shrink-0">
+                            <div class="shrink-0">
                                 <svg class="h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                     stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -37,7 +37,7 @@
                 <div class="overflow-hidden rounded-lg bg-white shadow ring-1 ring-slate-900/5">
                     <div class="p-5">
                         <div class="flex items-center">
-                            <div class="flex-shrink-0">
+                            <div class="shrink-0">
                                 <svg class="h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                     stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -61,7 +61,7 @@
                 <div class="overflow-hidden rounded-lg bg-white shadow ring-1 ring-slate-900/5">
                     <div class="p-5">
                         <div class="flex items-center">
-                            <div class="flex-shrink-0">
+                            <div class="shrink-0">
                                 <svg class="h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                     stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -84,7 +84,7 @@
                 <div class="overflow-hidden rounded-lg bg-white shadow ring-1 ring-slate-900/5">
                     <div class="p-5">
                         <div class="flex items-center">
-                            <div class="flex-shrink-0">
+                            <div class="shrink-0">
                                 <svg class="h-6 w-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                     stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -108,7 +108,7 @@
                 <div class="overflow-hidden rounded-lg bg-amber-50 shadow ring-1 ring-amber-900/10">
                     <div class="p-5">
                         <div class="flex items-center">
-                            <div class="flex-shrink-0">
+                            <div class="shrink-0">
                                 <svg class="h-6 w-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                     stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round"

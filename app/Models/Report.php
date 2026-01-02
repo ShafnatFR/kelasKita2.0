@@ -15,4 +15,9 @@ class Report extends Model
     {
         return $this->belongsTo(User::class, 'id_user');
     }
+
+    public function adminNote()
+    {
+        return $this->morphOne(AdminNote::class, 'notable');
+    }
 }

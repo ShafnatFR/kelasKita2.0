@@ -16,7 +16,7 @@ class ReportFactory extends Factory
             'id_kelas' => \App\Models\Kelas::factory(),
             'kategori' => $this->faker->randomElement(['Bug', 'Konten Error', 'Pembayaran', 'Lainnya']),
             'keterangan' => $this->faker->paragraph(2),
-            'status' => $this->faker->randomElement(['open', 'resolved']),
+            'status' => $this->faker->randomElement(['pending', 'in_progress', 'resolved']),
         ];
     }
 }

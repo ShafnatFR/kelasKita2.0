@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
+
 class Kelas extends Model
 {
     use HasFactory;
 
     protected $table = 'kelas';
+
     protected $primaryKey = 'id_kelas';
     
     protected $fillable = [
@@ -22,7 +24,6 @@ class Kelas extends Model
         'thumbnail',
         'description',
         'status_publikasi',
-        'catatan_admin'
     ];
 
     protected $casts = [
@@ -66,3 +67,14 @@ class Kelas extends Model
         });
     }
 }
+
+    public function transaksiDetails()
+    {
+        return $this->hasMany(TransaksiDetail::class, 'id_kelas');
+    }
+
+    public function adminNote()
+    {
+        return $this->morphOne(AdminNote::class, 'notable');
+    }
+

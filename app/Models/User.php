@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
@@ -11,17 +13,23 @@ class User extends Authenticatable
 
     // Role Constant
     const ROLE_ADMIN = 'admin';
+
     const ROLE_MENTOR = 'mentor';
+
     const ROLE_USER = 'student';
 
     // Status Constant
     const STATUS_ACTIVE = 'active';
+
     const STATUS_INACTIVE = 'inactive';
+
     const STATUS_BANNED = 'banned';
 
     protected $table = 'users';
     protected $primaryKey = 'id_user';
     public $timestamps = false;
+
+    protected $primaryKey = 'id_user'; // Custom PK
 
     protected $fillable = [
         'first_name',
@@ -32,7 +40,7 @@ class User extends Authenticatable
         'role',
         'deskripsi',
         'foto_profil',
-        'status'
+        'status',
     ];
 
     protected $hidden = [
@@ -70,4 +78,30 @@ class User extends Authenticatable
     {
         return $this->hasOne(Mentor::class, 'id_user', 'id_user');
     }
+
+
+    public function socialAccounts()
+    {
+        return $this->hasMany(SocialAccount::class, 'id_user');
+    }
+
+    public function adminNote()
+    {
+        return $this->morphOne(AdminNote::class, 'notable');
+    }
+
+    // Relasi ke Transaksi
+    public function transaksis()
+    {
+        return $this->hasMany(Transaksi::class, 'id_user');
+    }
 }
+    /*
+    // Relasi ke Kelas yang sudah diambil (via Progress)
+    public function enrolledClasses()
+    {
+        return $this->hasManyThrough(Kelas::class, ProgressSubMateri::class, 'id_user', 'id_kelas', 'id_user', 'id_kelas')->distinct();
+    }
+    */
+
+

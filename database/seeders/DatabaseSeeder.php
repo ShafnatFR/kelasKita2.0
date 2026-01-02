@@ -2,20 +2,20 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\User;
-use App\Models\Mentor;
+use App\Models\Dokumen;
 use App\Models\Kelas;
 use App\Models\Materi;
-use App\Models\SubMateri;
-use App\Models\Video;
-use App\Models\Dokumen;
+use App\Models\Mentor;
 use App\Models\MetodePembayaran;
+use App\Models\ProgressSubMateri;
+use App\Models\Report;
+use App\Models\Review;
+use App\Models\SubMateri;
 use App\Models\Transaksi;
 use App\Models\TransaksiDetail;
-use App\Models\ProgressSubMateri;
-use App\Models\Review;
-use App\Models\Report;
+use App\Models\User;
+use App\Models\Video;
+use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
         // ==========================================
         // 1. DATA MASTER (FIXED)
         // ==========================================
-        
+
         // Buat 1 Akun Admin Pasti (untuk Login Developer)
         User::factory()->create([
             'first_name' => 'Super',
@@ -46,10 +46,10 @@ class DatabaseSeeder extends Seeder
             'role' => 'mentor',
             'status' => 'active',
         ]);
-        
+
         $mentorFixed = Mentor::factory()->create([
             'id_user' => $mentorUser->id_user,
-            'status' => 'approved'
+            'status' => 'approved',
         ]);
 
         // Buat 1 Akun Student Pasti
@@ -69,32 +69,30 @@ class DatabaseSeeder extends Seeder
             MetodePembayaran::factory()->create(['nama_metode' => $m]);
         }
 
-
         // ==========================================
         // 2. GENERATE MASSIVE USERS
         // ==========================================
-        
+
         // Buat 10 Mentor Random Tambahan
         $randomMentors = Mentor::factory()->count(10)->create();
 
         // Buat 40 Student Random Tambahan
         $randomStudents = User::factory()->count(40)->state(['role' => 'student'])->create();
-        
+
         // Gabungkan student fixed & random untuk pool pembeli
         $allStudents = $randomStudents->push($studentFixed);
         $allMentors = $randomMentors->push($mentorFixed);
 
-
         // ==========================================
         // 3. GENERATE COURSE STRUCTURE (Kelas -> Bab -> Video)
         // ==========================================
-        
+
         $allKelas = collect();
 
         foreach ($allMentors as $mentor) {
             // Setiap mentor bikin 2-3 kelas
             $kelasMentor = Kelas::factory()->count(rand(2, 3))->create([
-                'id_mentor' => $mentor->id_mentor
+                'id_mentor' => $mentor->id_mentor,
             ]);
 
             foreach ($kelasMentor as $kelas) {
@@ -102,7 +100,7 @@ class DatabaseSeeder extends Seeder
 
                 // Setiap kelas punya 3-5 Bab (Materi)
                 $materis = Materi::factory()->count(rand(3, 5))->create([
-                    'id_kelas' => $kelas->id_kelas
+                    'id_kelas' => $kelas->id_kelas,
                 ]);
 
                 foreach ($materis as $materi) {
@@ -110,7 +108,7 @@ class DatabaseSeeder extends Seeder
                     // Kita mix antara Video dan Dokumen
                     for ($i = 1; $i <= rand(2, 4); $i++) {
                         $isVideo = rand(0, 1); // 50% chance video, 50% dokumen
-                        
+
                         $assetId = null;
                         $assetType = null;
 
@@ -124,13 +122,12 @@ class DatabaseSeeder extends Seeder
 
                         SubMateri::factory()->create(array_merge($subData, [
                             'id_materi' => $materi->id_materi,
-                            'urutan' => $i
+                            'urutan' => $i,
                         ]));
                     }
                 }
             }
         }
-
 
         // ==========================================
         // 4. GENERATE TRANSACTIONS & ENROLLMENTS
@@ -152,7 +149,7 @@ class DatabaseSeeder extends Seeder
                 TransaksiDetail::factory()->create([
                     'id_transaksi' => $trx->id_transaksi,
                     'id_kelas' => $kelas->id_kelas,
-                    'harga_saat_beli' => $kelas->harga
+                    'harga_saat_beli' => $kelas->harga,
                 ]);
 
                 // 3. Generate Progress Belajar (Karena sudah paid)
@@ -168,7 +165,7 @@ class DatabaseSeeder extends Seeder
                         'id_user' => $student->id_user,
                         'id_kelas' => $kelas->id_kelas,
                         'id_sub_materi' => $sub->id_sub_materi,
-                        'is_completed' => (bool)rand(0, 1)
+                        'is_completed' => (bool) rand(0, 1),
                     ]);
                 }
 
@@ -176,19 +173,37 @@ class DatabaseSeeder extends Seeder
                 if (rand(1, 10) <= 4) {
                     Review::factory()->create([
                         'id_user' => $student->id_user,
-                        'id_kelas' => $kelas->id_kelas
+                        'id_kelas' => $kelas->id_kelas,
                     ]);
                 }
             }
         }
-
 
         // ==========================================
         // 5. GENERATE REPORTS (Random Isu)
         // ==========================================
         Report::factory()->count(15)->create([
             'id_user' => $allStudents->random()->id_user,
-            'id_kelas' => $allKelas->random()->id_kelas
+            'id_kelas' => $allKelas->random()->id_kelas,
         ]);
+
+        // ==========================================
+        // 6. GENERATE ADMIN NOTES (Random)
+        // ==========================================
+
+        // Add notes to random users
+        $allStudents->random(10)->each(function ($user) {
+            $user->adminNote()->create(['content' => 'Catatan untuk user: '.fake()->sentence()]);
+        });
+
+        // Add notes to random reports
+        Report::all()->random(5)->each(function ($report) {
+            $report->adminNote()->create(['content' => 'Catatan teknis laporan: '.fake()->sentence()]);
+        });
+
+        // Add notes to random classes
+        Kelas::all()->random(5)->each(function ($kelas) {
+            $kelas->adminNote()->create(['content' => 'Catatan review kelas: '.fake()->sentence()]);
+        });
     }
 }

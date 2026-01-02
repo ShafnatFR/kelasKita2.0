@@ -38,4 +38,54 @@ class ReportController extends Controller
 
         return view('admin.pages.kelola-report.index', compact('report', 'kategoriUnik', 'statusUnik'));
     }
+    public function show($id)
+    {
+        $report = Report::with('user')->findOrFail($id);
+        
+        // Ambil daftar report lain untuk sidebar (exclude yg sedang dibuka)
+        // Kita ambil 20 terakhir agar tidak terlalu berat
+        $sidebarReports = Report::where('id_report', '!=', $id)
+            ->latest()
+            ->limit(20)
+            ->get();
+
+        return view('admin.pages.kelola-report.show', compact('report', 'sidebarReports'));
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,in_progress,resolved',
+        ]);
+
+        $report = Report::findOrFail($id);
+        $report->update(['status' => $request->status]);
+
+        return back()->with('success', 'Status laporan berhasil diperbarui.');
+    }
+
+    public function updateCatatan(Request $request, $id)
+    {
+        $request->validate([
+            'catatan_admin' => 'nullable|string',
+        ]);
+
+        $report = Report::findOrFail($id);
+        
+        if ($report->adminNote) {
+            $report->adminNote->update(['content' => $request->catatan_admin]);
+        } else {
+             $report->adminNote()->create(['content' => $request->catatan_admin]);
+        }
+
+        return back()->with('success', 'Catatan admin berhasil disimpan.');
+    }
+
+    public function destroy($id)
+    {
+        $report = Report::findOrFail($id);
+        $report->delete();
+
+        return redirect()->route('admin.kelola.report')->with('success', 'Laporan berhasil dihapus.');
+    }
 }
