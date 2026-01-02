@@ -35,6 +35,9 @@ Route::middleware(['auth:admin'])->group(function () {
 
     Route::get('/kelola-laporan', [LaporanController::class, 'index'])->name('admin.kelola.laporan');
     Route::get('/kelola-user', [UserController::class, 'index'])->name('admin.kelola.user');
+    Route::get('/kelola-user/create', [UserController::class, 'create'])->name('admin.kelola.user.create');
+    Route::post('/kelola-user', [UserController::class, 'store'])->name('admin.kelola.user.store');
+    
     Route::get('/kelola-user/{id}', [UserController::class, 'show'])->name('admin.kelola.user.show');
     
     Route::put('/kelola-user/{id}/status', [UserController::class, 'updateStatus'])->name('admin.kelola.user.update-status');

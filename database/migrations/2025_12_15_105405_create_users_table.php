@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string('email')->unique();
             $table->string('password');
             $table->enum('role', ['admin', 'mentor', 'student'])->default('student');
-            $table->text('deskripsi');
+            $table->text('deskripsi')->nullable();
             $table->string('foto_profil')->nullable();
             $table->enum('status', ['active', 'inactive', 'banned'])->default('active');
             // perbedaan status:

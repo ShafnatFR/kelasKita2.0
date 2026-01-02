@@ -42,6 +42,45 @@ class UserController extends Controller
         return view('admin.pages.kelola-user.index', compact('users', 'roles', 'statuses'));
     }
 
+    public function create()
+    {
+        return view('admin.pages.kelola-user.create');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'first_name' => 'required|string|max:50',
+            'last_name' => 'required|string|max:50',
+            'username' => 'required|string|max:20|unique:users,username',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
+            'role' => 'required|in:admin,mentor,student',
+            'status' => 'required|in:active,inactive,banned',
+        ]);
+
+        $user = User::create([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'username' => $request->username,
+            'email' => $request->email,
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            'role' => $request->role,
+            'status' => $request->status,
+            'foto_profil' => 'avatars/default.jpg', // Default avatar
+        ]);
+
+        // Jika role mentor, buat juga record di tabel mentors
+        if ($request->role === 'mentor') {
+            \App\Models\Mentor::create([
+                'id_user' => $user->id_user,
+                'status' => 'pending', // Default status mentor baru
+            ]);
+        }
+
+        return redirect()->route('admin.kelola.user')->with('success', 'User berhasil ditambahkan.');
+    }
+
     public function show($id)
     {
         $user = User::findOrFail($id);

@@ -9,9 +9,9 @@
                 <p class="mt-1 text-sm text-slate-500">Manajemen pengguna, role, dan status akun.</p>
             </div>
             <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-                <button type="button"
+                <a href="{{ route('admin.kelola.user.create') }}"
                     class="block rounded-md bg-blue-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">Tambah
-                    User</button>
+                    User</a>
             </div>
         </div>
 

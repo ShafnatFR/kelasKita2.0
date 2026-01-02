@@ -73,7 +73,7 @@ class KelasController extends Controller
         ]);
 
         $kelas = Kelas::findOrFail($id);
-        
+
         if ($kelas->adminNote) {
             $kelas->adminNote->update(['content' => $request->catatan_admin]);
         } else {

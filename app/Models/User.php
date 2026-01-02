@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class User extends Authenticatable
 {
@@ -12,15 +12,20 @@ class User extends Authenticatable
 
     // Role Constant
     const ROLE_ADMIN = 'admin';
+
     const ROLE_MENTOR = 'mentor';
+
     const ROLE_USER = 'student';
 
     // Status Constant
     const STATUS_ACTIVE = 'active';
+
     const STATUS_INACTIVE = 'inactive';
+
     const STATUS_BANNED = 'banned';
 
     protected $table = 'users';
+
     protected $primaryKey = 'id_user'; // Custom PK
 
     protected $fillable = [
@@ -32,7 +37,7 @@ class User extends Authenticatable
         'role',
         'deskripsi',
         'foto_profil',
-        'status'
+        'status',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -84,6 +89,6 @@ class User extends Authenticatable
     public function enrolledClasses()
     {
         return $this->hasManyThrough(Kelas::class, ProgressSubMateri::class, 'id_user', 'id_kelas', 'id_user', 'id_kelas')->distinct();
-    } 
+    }
     */
 }
