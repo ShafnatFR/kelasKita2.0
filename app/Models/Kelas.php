@@ -20,7 +20,8 @@ class Kelas extends Model
         'harga',
         'thumbnail',
         'description',
-        'status_publikasi'
+        'status_publikasi',
+        'catatan_admin'
     ];
 
     public function mentor()
