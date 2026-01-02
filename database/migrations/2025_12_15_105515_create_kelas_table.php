@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->string('slug')->unique();
             $table->string('kategori');
             $table->decimal('harga', 12, 2)->default(0);
+            $table->text('catatan_admin')->nullable();
             $table->string('thumbnail')->nullable();
             $table->text('description');
             $table->enum('status_publikasi', ['draft', 'published', 'archived'])->default('draft');

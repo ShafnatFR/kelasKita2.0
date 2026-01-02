@@ -22,6 +22,7 @@ class Kelas extends Model
         'thumbnail',
         'description',
         'status_publikasi',
+        'catatan_admin'
     ];
 
     protected $casts = [

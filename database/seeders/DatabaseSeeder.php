@@ -66,7 +66,7 @@ class DatabaseSeeder extends Seeder
         // Buat Metode Pembayaran
         $methods = ['BCA Virtual Account', 'Mandiri Transfer', 'GoPay', 'OVO', 'Credit Card'];
         foreach ($methods as $m) {
-            MetodePembayaran::factory()->create(['metode' => $m]);
+            MetodePembayaran::factory()->create(['nama_metode' => $m]);
         }
 
 

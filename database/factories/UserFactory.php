@@ -18,6 +18,7 @@ class UserFactory extends Factory
             'email' => $this->faker->unique()->safeEmail(),
             'password' => bcrypt('password'), // Default password
             'role' => $this->faker->randomElement(['student', 'student', 'student', 'mentor', 'admin']), // Lebih banyak student
+            'deskripsi' => $this->faker->sentence(),
             'foto_profil' => 'avatars/default.jpg',
             'status' => $this->faker->randomElement(['active', 'active', 'inactive']),
             'created_at' => now(),
