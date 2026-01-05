@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Murid;
 
 use App\Http\Controllers\Controller;
 use App\Models\Review;
@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Validator;
 
 class ApiReviewController extends Controller
 {
-    /**
-     * READ: Menampilkan semua ulasan untuk kelas tertentu
-     */
     public function index($id_kelas)
     {
         $reviews = Review::with('user')
@@ -27,9 +24,6 @@ class ApiReviewController extends Controller
         ], 200);
     }
 
-    /**
-     * CREATE: Menambahkan ulasan baru
-     */
     public function store(Request $request, $id_kelas)
     {
         $validator = Validator::make($request->all(), [
@@ -58,9 +52,6 @@ class ApiReviewController extends Controller
         ], 201);
     }
 
-    /**
-     * UPDATE: Memperbarui ulasan yang sudah ada
-     */
     public function update(Request $request, $id_review)
     {
         $validator = Validator::make($request->all(), [
@@ -75,8 +66,8 @@ class ApiReviewController extends Controller
             ], 422);
         }
 
-        // Cari review berdasarkan ID dan pastikan milik user yang sedang login
-        $review = Review::where('id', $id_review)
+        // PERBAIKAN: Gunakan 'id_review' bukan 'id'
+        $review = Review::where('id_review', $id_review)
             ->where('id_user', Auth::id())
             ->first();
 
@@ -99,12 +90,10 @@ class ApiReviewController extends Controller
         ], 200);
     }
 
-    /**
-     * DELETE: Menghapus ulasan
-     */
     public function destroy($id_review)
     {
-        $review = Review::where('id', $id_review)
+        // PERBAIKAN: Gunakan 'id_review' bukan 'id'
+        $review = Review::where('id_review', $id_review)
             ->where('id_user', Auth::id())
             ->first();
 
