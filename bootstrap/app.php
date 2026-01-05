@@ -17,6 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->group(base_path('routes/admin.php'));
         },
     )
+    ->withMiddleware(function (Middleware $middleware) {
+        // Tambahkan custom middleware dengan alias
+        $middleware->alias([
+            'custom.auth' => \App\Http\Middleware\CustomSanctumAuth::class,
+        ]);
+    })
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo(function () {
              // Jika request ke admin*, arahkan ke admin login
@@ -27,6 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return route('login'); // pastikan route 'login' ada di web.php
         });
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
+
+    ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

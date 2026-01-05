@@ -20,26 +20,27 @@ class SubMateri extends Model
         'judul_sub',
         'teks_pembelajaran'
     ];
-
     public function materi()
     {
-        return $this->belongsTo(Materi::class, 'id_materi');
+        return $this->belongsTo(Materi::class, 'id_materi', 'id_materi');
     }
 
     public function video()
     {
-        return $this->belongsTo(Video::class, 'id_video');
+        // Pastikan Model Video sudah ada
+        return $this->belongsTo(Video::class, 'id_video', 'id_video');
     }
 
     public function dokumen()
     {
-        return $this->belongsTo(Dokumen::class, 'id_dokumen');
+        // Pastikan Model Dokumen sudah ada
+        return $this->belongsTo(Dokumen::class, 'id_dokumen', 'id_dokumen');
     }
 
-    // Cek apakah user tertentu sudah menyelesaikan materi ini
+    // Progress logic (Bagus, pertahankan!)
     public function isCompletedBy($userId)
     {
-        return $this->hasOne(ProgressSubMateri::class, 'id_sub_materi')
+        return $this->hasOne(ProgressSubMateri::class, 'id_sub_materi', 'id_sub_materi')
             ->where('id_user', $userId)
             ->where('is_completed', true)
             ->exists();
