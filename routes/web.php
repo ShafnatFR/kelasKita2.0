@@ -7,6 +7,10 @@ use App\Http\Controllers\Api\Mentor\KelasController;
 use App\Http\Controllers\Api\Mentor\MateriController;
 use App\Http\Controllers\Api\Mentor\SubMateriController;
 
+use App\Http\Controllers\ProgressController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ReportController;
+
 Route::get('/', function () {
     return view('welcome');
 });

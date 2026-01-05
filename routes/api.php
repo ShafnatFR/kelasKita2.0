@@ -54,9 +54,17 @@ Route::middleware('custom.auth')->group(function () {
     Route::get('/mentor/reviews', [MentorDashboardController::class, 'getReviews']);
 });
 
+
+
+/*
+|--------------------------------------------------------------------------
+| User Global Info
+|--------------------------------------------------------------------------
+*/
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
 
 Route::prefix('admin')->group(function () {
     // Public routes
@@ -82,3 +90,4 @@ Route::prefix('admin')->group(function () {
         });
     });
 });
+
