@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\Mentor\MentorDashboardController; // Pastikan path ini sesuai
+use App\Http\Controllers\HomeController;    
+use App\Http\Controllers\KeranjangController;
+use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\Api\Mentor\KelasController;
 use App\Http\Controllers\Api\Mentor\MateriController;
 use App\Http\Controllers\Api\Mentor\SubMateriController;
@@ -15,6 +18,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Halaman Home
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+//detail kelas
+Route::get('/kelas/{id_kelas}', [StudentKelasController::class, 'show'])->name('kelas.detail');
+
 // Route untuk menampilkan view ini
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
@@ -25,13 +34,24 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.su
 
 // Logout
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-// Route::middleware(['auth'])->group(function () {
-    
-//     Route::get('/student/dashboard', function () {
-//         return "Halo Siswa! Ini Dashboard Student (Masih Kosong).";
-//     })->name('student.dashboard');
 
-// });
+ Route::middleware(['auth'])->group(function () {
+
+    // 1. Keranjang
+    Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang.index');
+    Route::post('/keranjang/tambah', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');
+    Route::delete('/keranjang/hapus/{id_keranjang}', [KeranjangController::class, 'hapus'])->name('keranjang.hapus');
+
+    // 2. Transaksi & Checkout
+    Route::post('/checkout', [TransaksiController::class, 'checkout'])->name('checkout.process');
+    Route::get('/transaksi/{id_transaksi}', [TransaksiController::class, 'show'])->name('transaksi.show');
+    Route::post('/transaksi/bayar', [TransaksiController::class, 'bayar'])->name('transaksi.bayar');
+
+    Route::get('/student/dashboard', function () {
+        return "Halo Siswa! Ini Dashboard Student (Masih Kosong).";
+    })->name('student.dashboard');
+
+});
 
 Route::middleware(['auth'])->prefix('mentor')->name('mentor.')->group(function () {
 

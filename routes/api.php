@@ -3,7 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\HomeApiController;
 use App\Http\Controllers\Api\KelasController;
+use App\Http\Controllers\Api\KeranjangApiController;
+use App\Http\Controllers\Api\TransaksiApiController;
 use App\Http\Controllers\Api\MateriController;
 use App\Http\Controllers\Api\SubMateriController;
 use App\Http\Controllers\Api\VideoController;
@@ -14,12 +17,28 @@ use App\Http\Controllers\Api\MentorDashboardController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// Home endpoints
+Route::get('/home', [HomeApiController::class, 'index']);
+
 // === PROTECTED ROUTES (pakai custom middleware) ===
 Route::middleware('custom.auth')->group(function () {
     
     // Auth endpoints
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/become-mentor', [AuthController::class, 'becomeMentor']);
+
+    // Keranjang endpoints
+    Route::get('/keranjang', [KeranjangApiController::class, 'index']);
+    Route::post('/keranjang', [KeranjangApiController::class, 'store']);
+    Route::delete('/keranjang/{id_keranjang}', [KeranjangApiController::class, 'destroy']);
+
+    // Transaksi endpoints
+    Route::post('/transaksi/checkout', [TransaksiApiController::class, 'checkout']);
+    Route::get('/transaksi/{id_transaksi}', [TransaksiApiController::class, 'show']);
+    Route::post('/transaksi/bayar', [TransaksiApiController::class, 'bayar']);
+    
+    // Metode Pembayaran endpoints
+    Route::get('/metode-pembayaran', [TransaksiApiController::class, 'getPaymentMethods']);
     
     // Kelas endpoints
     Route::get('/kelas', [KelasController::class, 'index']);
