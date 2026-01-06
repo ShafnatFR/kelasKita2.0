@@ -105,4 +105,3 @@ Route::middleware(['auth'])->prefix('mentor')->name('mentor.')->group(function (
         });
     });
 });
-});

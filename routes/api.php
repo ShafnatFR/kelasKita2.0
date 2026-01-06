@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\MentorDashboardController;
 use App\Http\Controllers\Api\Murid\ApiReviewController;
 use App\Http\Controllers\Api\Murid\ApiProgressController;
 use App\Http\Controllers\Api\Murid\ApiReportController;
+use App\Http\Controllers\TransaksiController;
+
 
 // === PUBLIC ROUTES ===
 Route::post('/register', [AuthController::class, 'register']);
