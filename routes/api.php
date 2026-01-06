@@ -16,6 +16,10 @@ use App\Http\Controllers\Api\Murid\ApiReviewController;
 use App\Http\Controllers\Api\Murid\ApiProgressController;
 use App\Http\Controllers\Api\Murid\ApiReportController;
 use App\Http\Controllers\TransaksiController;
+<<<<<<< HEAD
+=======
+
+>>>>>>> efbcbf5573f932b47c361a4f09f6de3e5e9fe537
 
 // === PUBLIC ROUTES ===
 Route::post('/register', [AuthController::class, 'register']);

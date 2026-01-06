@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB; // Wajib untuk transaksi 2 tabel
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Mentor;
+use App\Models\Transaksi; 
 
 class AuthController extends Controller
 {
@@ -33,17 +34,28 @@ class AuthController extends Controller
             $request->session()->regenerate();
             $user = Auth::user();
 
-            // 3. Cek Status User (Sesuai Enum di tabel users: active, inactive, banned)
+            // 3. Cek Status User
             if ($user->status !== 'active' && $user->role !== 'admin') {
                 Auth::logout();
                 return back()->withErrors(['email' => 'Akun Anda tidak aktif atau dibanned.']);
             }
 
-            // 4. Redirect sesuai Role (Sesuai Enum di tabel users: admin, mentor, student)
+            // 4. Redirect sesuai Role
             if ($user->role === 'mentor') {
                 return redirect()->route('mentor.dashboard');
+
             } elseif ($user->role === 'student') {
-                return redirect()->route('student.dashboard');
+
+                $kelas = Transaksi::where('id_user', $user->id_user)
+                    ->where('status', 'success')
+                    ->first();
+
+                if ($kelas) {
+                    return redirect()->route('kelas.belajar', $kelas->id_kelas);
+                }
+
+                return redirect()->route('learning.index');
+
             } elseif ($user->role === 'admin') {
                 return redirect()->route('admin.dashboard'); 
             }
@@ -70,37 +82,34 @@ class AuthController extends Controller
     {
         // 1. Validasi Input Form
         $request->validate([
-            'fullname' => 'required|string|max:255', // Di form 'name'-nya fullname
+            'fullname' => 'required|string|max:255',
             'username' => 'required|string|max:50|unique:users,username',
             'email'    => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
-            'role'     => 'required|in:student,mentor', // Pilihan role
+            'role'     => 'required|in:student,mentor',
         ]);
 
-        // 2. Gunakan Database Transaction
-        // Agar jika gagal simpan Mentor, data User juga batal disimpan (bersih)
         DB::beginTransaction();
 
         try {
-            // A. Simpan ke Tabel 'users'
-            // Mapping: Input 'fullname' masuk ke kolom 'first_name'
+            // A. Simpan ke tabel users
             $user = User::create([
-                'first_name' => $request->fullname, 
-                'last_name'  => null, // Nullable sesuai migrasi Anda
+                'first_name' => $request->fullname,
+                'last_name'  => null,
                 'username'   => $request->username,
                 'email'      => $request->email,
                 'password'   => Hash::make($request->password),
-                'role'       => $request->role, 
-                'status'     => 'active', // Default aktif agar bisa login
+                'role'       => $request->role,
+                'status'     => 'active',
                 'deskripsi'  => null,
                 'foto_profil'=> null,
             ]);
 
-            // B. Simpan Data Tambahan ke Tabel 'mentors' (Jika role = mentor)
+            // B. Jika Mentor
             if ($request->role === 'mentor') {
                 Mentor::create([
-                    'id_user' => $user->id_user, // FK ke users
-                    'status'  => 'pending',      // Default pending sesuai migrasi Anda
+                    'id_user' => $user->id_user,
+                    'status'  => 'pending',
                     'keahlian'=> null,
                     'deskripsi_mentor' => null,
                     'bank_name' => null,
@@ -108,15 +117,8 @@ class AuthController extends Controller
                     'nama_rekening_mentor' => null
                 ]);
             }
-            
-            // C. Jika Role Student
-            // Karena Anda bilang modul student dikerjakan teman, 
-            // kita biarkan dia terdaftar di tabel 'users' saja sudah cukup untuk login.
-            /* elseif ($request->role === 'student') {
-                 // Student::create(['id_user' => $user->id_user]);
-            } */
 
-            DB::commit(); // Simpan Data Permanen
+            DB::commit();
 
             // 3. Login Otomatis
             Auth::login($user);
@@ -125,11 +127,11 @@ class AuthController extends Controller
             if ($user->role === 'mentor') {
                 return redirect()->route('mentor.dashboard');
             } else {
-                return redirect()->route('student.dashboard'); 
+                return redirect()->route('learning.index');
             }
 
         } catch (\Exception $e) {
-            DB::rollBack(); // Batalkan semua jika ada error
+            DB::rollBack();
             return back()->withErrors(['error' => 'Gagal mendaftar: ' . $e->getMessage()])->withInput();
         }
     }
