@@ -12,6 +12,9 @@ use App\Http\Controllers\Api\SubMateriController;
 use App\Http\Controllers\Api\VideoController;
 use App\Http\Controllers\Api\DokumenController;
 use App\Http\Controllers\Api\MentorDashboardController;
+use App\Http\Controllers\Api\Murid\ApiReviewController;
+use App\Http\Controllers\Api\Murid\ApiProgressController;
+use App\Http\Controllers\Api\Murid\ApiReportController;
 
 // === PUBLIC ROUTES ===
 Route::post('/register', [AuthController::class, 'register']);

@@ -11,8 +11,12 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
+<<<<<<< HEAD
+        "laravel/sanctum": "^4.2",
+=======
         "laravel/sanctum": "*",
         "laravel/sanctum": "^4.0",
+>>>>>>> 86160b9756dd2aaf3d84fee7ee1cdc37bb06906a
         "laravel/tinker": "^2.10.1"
     },
     "require-dev": {

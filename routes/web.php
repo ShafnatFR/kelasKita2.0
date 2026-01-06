@@ -67,6 +67,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     });
 
+});
+
+// --- RUTE MENTOR ---
 Route::middleware(['auth'])->prefix('mentor')->name('mentor.')->group(function () {
 
     // 1. DASHBOARD
@@ -86,20 +89,19 @@ Route::middleware(['auth'])->prefix('mentor')->name('mentor.')->group(function (
         
         // --- BAGIAN BAB (Materi) ---
         Route::get('/', [MateriController::class, 'indexWeb'])->name('index'); // Halaman Kurikulum
-        Route::post('/', [MateriController::class, 'store'])->name('store'); // <--- INI YG SEBELUMNYA HILANG
+        Route::post('/', [MateriController::class, 'store'])->name('store'); 
         
         Route::get('/{id_materi}/edit', [MateriController::class, 'edit'])->name('edit');
         Route::put('/{id_materi}', [MateriController::class, 'update'])->name('update');
         Route::delete('/{id_materi}', [MateriController::class, 'destroy'])->name('destroy');
 
         // --- BAGIAN SUB-MATERI (Video/Dokumen) ---
-        // Nanti kita pakai ini untuk upload file
         Route::prefix('{id_materi}/sub')->name('sub.')->group(function () {
              Route::get('/create', [SubMateriController::class, 'create'])->name('create');
              Route::post('/', [SubMateriController::class, 'store'])->name('store');
-                Route::get('/{id_sub_materi}/edit', [SubMateriController::class, 'edit'])->name('edit');
-                Route::put('/{id_sub_materi}', [SubMateriController::class, 'update'])->name('update');
-                Route::delete('/{id_sub_materi}', [SubMateriController::class, 'destroy'])->name('destroy');
+             Route::get('/{id_sub_materi}/edit', [SubMateriController::class, 'edit'])->name('edit');
+             Route::put('/{id_sub_materi}', [SubMateriController::class, 'update'])->name('update');
+             Route::delete('/{id_sub_materi}', [SubMateriController::class, 'destroy'])->name('destroy');
         });
     });
 });

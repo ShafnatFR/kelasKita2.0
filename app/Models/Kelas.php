@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-
 class Kelas extends Model
 {
     use HasFactory;
@@ -67,7 +66,6 @@ class Kelas extends Model
         });
     }
 
-
     public function transaksiDetails()
     {
         return $this->hasMany(TransaksiDetail::class, 'id_kelas');
@@ -83,6 +81,16 @@ class Kelas extends Model
         return $this->morphOne(AdminNote::class, 'notable');
     }
 
+    // ============================================================
+    // TAMBAHAN: Relasi agar Controller Progress tidak Error
+    // ============================================================
     
-
+    /**
+     * Menghubungkan Kelas ke Materi (Bab)
+     * Dibutuhkan oleh ApiProgressController::index
+     */
+    public function materi()
+    {
+        return $this->hasMany(Materi::class, 'id_kelas', 'id_kelas');
+    }
 }

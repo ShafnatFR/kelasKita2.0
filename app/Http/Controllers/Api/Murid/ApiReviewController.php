@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Murid;
 
 use App\Http\Controllers\Controller;
 use App\Models\Review;
@@ -11,11 +11,12 @@ use Illuminate\Support\Facades\Validator;
 class ApiReviewController extends Controller
 {
     /**
-     * READ: Menampilkan semua ulasan untuk kelas tertentu
+     * Menampilkan daftar ulasan berdasarkan ID Kelas.
      */
     public function index($id_kelas)
     {
-        $reviews = Review::with('user')
+        // Mengambil review beserta data user (nama & foto)
+        $reviews = Review::with('user:id,name,avatar')
             ->where('id_kelas', $id_kelas)
             ->latest()
             ->get();
@@ -28,7 +29,7 @@ class ApiReviewController extends Controller
     }
 
     /**
-     * CREATE: Menambahkan ulasan baru
+     * Menyimpan ulasan baru untuk kelas tertentu.
      */
     public function store(Request $request, $id_kelas)
     {
@@ -40,6 +41,7 @@ class ApiReviewController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
+                'message' => 'Validasi gagal',
                 'errors' => $validator->errors()
             ], 422);
         }
@@ -59,7 +61,7 @@ class ApiReviewController extends Controller
     }
 
     /**
-     * UPDATE: Memperbarui ulasan yang sudah ada
+     * Memperbarui ulasan yang sudah ada.
      */
     public function update(Request $request, $id_review)
     {
@@ -71,19 +73,20 @@ class ApiReviewController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
+                'message' => 'Validasi gagal',
                 'errors' => $validator->errors()
             ], 422);
         }
 
-        // Cari review berdasarkan ID dan pastikan milik user yang sedang login
-        $review = Review::where('id', $id_review)
+        // Mencari berdasarkan kolom 'id_review' dan memastikan milik user yang login
+        $review = Review::where('id_review', $id_review)
             ->where('id_user', Auth::id())
             ->first();
 
         if (!$review) {
             return response()->json([
                 'success' => false,
-                'message' => 'Ulasan tidak ditemukan atau Anda tidak memiliki akses.'
+                'message' => 'Ulasan tidak ditemukan atau Anda tidak memiliki akses untuk mengubahnya.'
             ], 404);
         }
 
@@ -100,18 +103,19 @@ class ApiReviewController extends Controller
     }
 
     /**
-     * DELETE: Menghapus ulasan
+     * Menghapus ulasan.
      */
     public function destroy($id_review)
     {
-        $review = Review::where('id', $id_review)
+        // Mencari berdasarkan kolom 'id_review' dan memastikan milik user yang login
+        $review = Review::where('id_review', $id_review)
             ->where('id_user', Auth::id())
             ->first();
 
         if (!$review) {
             return response()->json([
                 'success' => false,
-                'message' => 'Ulasan tidak ditemukan atau Anda tidak memiliki akses.'
+                'message' => 'Ulasan tidak ditemukan atau Anda tidak memiliki akses untuk menghapusnya.'
             ], 404);
         }
 
