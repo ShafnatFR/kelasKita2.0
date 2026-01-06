@@ -1,9 +1,12 @@
-<?php
+    <?php
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\HomeApiController;
 use App\Http\Controllers\Api\KelasController;
+use App\Http\Controllers\Api\KeranjangApiController;
+use App\Http\Controllers\Api\TransaksiApiController;
 use App\Http\Controllers\Api\MateriController;
 use App\Http\Controllers\Api\SubMateriController;
 use App\Http\Controllers\Api\VideoController;
@@ -14,12 +17,31 @@ use App\Http\Controllers\Api\MentorDashboardController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// Home endpoints
+Route::get('/home', [HomeApiController::class, 'index']);
+
 // === PROTECTED ROUTES (pakai custom middleware) ===
 Route::middleware('custom.auth')->group(function () {
     
     // Auth endpoints
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/become-mentor', [AuthController::class, 'becomeMentor']);
+
+    // Keranjang endpoints
+    Route::get('/keranjang', [KeranjangApiController::class, 'index']);
+    Route::post('/keranjang', [KeranjangApiController::class, 'store']);
+    Route::delete('/keranjang/{id_keranjang}', [KeranjangApiController::class, 'destroy']);
+
+    // Transaksi endpoints
+    Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/checkout', [TransaksiController::class, 'process']);
+    Route::get('/transaksi/{id}', [TransaksiController::class, 'show']);
+    Route::post('/transaksi/checkout', [TransaksiApiController::class, 'checkout']);
+    Route::get('/transaksi/{id_transaksi}', [TransaksiApiController::class, 'show']);
+    Route::post('/transaksi/bayar', [TransaksiApiController::class, 'bayar']);
+    
+    // Metode Pembayaran endpoints
+    Route::get('/metode-pembayaran', [TransaksiApiController::class, 'getPaymentMethods']);
     
     // Kelas endpoints
     Route::get('/kelas', [KelasController::class, 'index']);
@@ -66,12 +88,13 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::prefix('admin')->group(function () {
-    // Public routes
-    Route::post('/login', [\App\Http\Controllers\Api\Admin\AuthController::class, 'login']);
+        Route::prefix('admin')->group(function () {
+        // Public routes
+        Route::post('/login', [\App\Http\Controllers\Api\Admin\AuthController::class, 'login']);
+
 
     // Protected routes
-    Route::middleware(['auth:sanctum', \App\Http\Middleware\EnsureAdmin::class])->group(function () {
+        Route::middleware(['auth:sanctum', \App\Http\Middleware\EnsureAdmin::class])->group(function () {
         Route::post('/logout', [\App\Http\Controllers\Api\Admin\AuthController::class, 'logout']);
         Route::get('/me', [\App\Http\Controllers\Api\Admin\AuthController::class, 'me']);
 
@@ -87,7 +110,8 @@ Route::prefix('admin')->group(function () {
             Route::patch('/{id}/status', [\App\Http\Controllers\Api\Admin\UserController::class, 'updateStatus']);
             Route::patch('/{id}/catatan', [\App\Http\Controllers\Api\Admin\UserController::class, 'updateCatatan']);
             Route::patch('/{id}/activate', [\App\Http\Controllers\Api\Admin\UserController::class, 'activate']);
+
         });
     });
 });
-
+});
