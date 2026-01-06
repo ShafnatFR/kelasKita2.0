@@ -97,8 +97,4 @@ Route::middleware(['auth'])->prefix('mentor')->name('mentor.')->group(function (
             Route::delete('/{id_sub_materi}', [SubMateriController::class, 'destroy'])->name('destroy');
         });
     });
-<<<<<<< HEAD
 });
-=======
-});
->>>>>>> efbcbf5573f932b47c361a4f09f6de3e5e9fe537
