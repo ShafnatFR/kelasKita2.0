@@ -7,29 +7,45 @@ use Illuminate\Support\Facades\DB;
 
 class KelasController extends Controller
 {
-    public function show($id)
+
+    public function index(Request $request)
     {
-        // 1. Ambil data kelas + join ke user untuk nama mentor
+        $kelas = DB::table('kelas')->get();
+
+        // JIKA API/POSTMAN
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'status' => 'success',
+                'data' => $kelas
+            ]);
+        }
+
+        return view('Home', compact('kelas'));
+    }
+
+    public function show(Request $request, $id)
+    {
         $kelas = DB::table('kelas')
-            // Gunakan leftJoin agar kalau mentornya hilang/terhapus, kelas TETAP MUNCUL
             ->leftJoin('users', 'kelas.id_mentor', '=', 'users.id_user')
-            ->select(
-                'kelas.*', 
-                'users.first_name', 
-                'users.last_name', 
-                'users.foto_profil',
-                'users.role'
-            )
+            ->select('kelas.*', 'users.first_name', 'users.last_name', 'users.foto_profil', 'users.role')
             ->where('kelas.id_kelas', $id)
             ->first();
 
-        // 2. Jika kelas tidak ditemukan, baru 404
         if (!$kelas) {
-            abort(404, "Data kelas tidak ditemukan di database.");
+            if ($request->wantsJson() || $request->is('api/*')) {
+                return response()->json(['message' => 'Kelas tidak ditemukan'], 404);
+            }
+            abort(404);
         }
 
-        // 3. Panggil View yang ada di folder luar (Detail_kelas.blade.php)
-        // Perhatikan penulisan nama file harus SAMA PERSIS
+        // JIKA API/POSTMAN
+        if ($request->wantsJson() || $request->is('api/*')) {
+            return response()->json([
+                'status' => 'success',
+                'data' => $kelas
+            ]);
+        }
+
         return view('Detail_kelas', compact('kelas'));
     }
 }

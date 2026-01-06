@@ -14,74 +14,188 @@ class TransaksiApiController extends Controller
 {
     public function checkout(Request $request): JsonResponse
     {
-        $userId = $request->id_user;
-        $keranjang = Keranjang::with('kelas')->where('id_user', $userId)->get();
-
-        if ($keranjang->isEmpty()) return response()->json(['success'=>false], 400);
-
-        $total = $keranjang->sum(fn($i) => $i->kelas->harga);
-        // Generate Invoice INV-TIMESTAMP-RAND
-        $kodeInvoice = 'INV-' . time() . '-' . rand(100,999);
-
-        DB::beginTransaction();
         try {
-            // Buat Transaksi sesuai struktur tabel
-            $trx = Transaksi::create([
-                'id_user' => $userId,
-                'kode_invoice' => $kodeInvoice,
-                'total_harga' => $total,
-                'status' => 'pending' // Default enum pending
-            ]);
-
-            // Pindahkan item keranjang ke detail transaksi
-            // Asumsi tabel transaksi_detail punya: id_transaksi, id_kelas, harga_saat_beli
-            foreach ($keranjang as $item) {
-                TransaksiDetail::create([
-                    'id_transaksi' => $trx->id_transaksi, // Pakai id_transaksi (PK)
-                    'id_kelas' => $item->id_kelas,
-                    'harga_saat_beli' => $item->kelas->harga
-                ]);
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not authenticated'
+                ], 401);
             }
 
-            // Hapus Keranjang
-            Keranjang::where('id_user', $userId)->delete();
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'id_metode_pembayaran' => 'nullable|exists:metode_pembayaran,id_mp'
+            ]);
 
-            DB::commit();
-            return response()->json(['success' => true, 'data' => $trx]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
 
+            $keranjang = Keranjang::with('kelas')->where('id_user', $user->id_user)->get();
+
+            if ($keranjang->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Keranjang kosong'
+                ], 400);
+            }
+
+            $total = $keranjang->sum(fn($i) => $i->kelas->harga);
+            $kodeInvoice = 'INV-' . time() . '-' . rand(100, 999);
+
+            DB::beginTransaction();
+            try {
+                $trx = Transaksi::create([
+                    'id_user' => $user->id_user,
+                    'kode_invoice' => $kodeInvoice,
+                    'total_harga' => $total,
+                    'id_mp' => $request->id_metode_pembayaran,
+                    'status' => 'pending'
+                ]);
+
+                foreach ($keranjang as $item) {
+                    TransaksiDetail::create([
+                        'id_transaksi' => $trx->id_transaksi,
+                        'id_kelas' => $item->id_kelas,
+                        'harga_saat_beli' => $item->kelas->harga
+                    ]);
+                }
+
+                Keranjang::where('id_user', $user->id_user)->delete();
+
+                DB::commit();
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Checkout berhasil',
+                    'data' => $trx
+                ], 201);
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
         } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat checkout',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
-    public function show($id_transaksi): JsonResponse
+    public function show(Request $request, $id_transaksi): JsonResponse
     {
-        // Ambil transaksi
-        $trx = Transaksi::where('id_transaksi', $id_transaksi)->first();
-        return response()->json(['success' => true, 'data' => $trx]);
+        try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not authenticated'
+                ], 401);
+            }
+
+            $trx = Transaksi::where('id_transaksi', $id_transaksi)
+                ->where('id_user', $user->id_user)
+                ->with('details')
+                ->first();
+
+            if (!$trx) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Transaksi tidak ditemukan'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $trx
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function getPaymentMethods(): JsonResponse
     {
-        // Ambil metode pembayaran aktif
-        $methods = MetodePembayaran::where('is_active', true)->get();
-        return response()->json(['success' => true, 'data' => $methods]);
+        try {
+            $methods = MetodePembayaran::where('is_active', true)->get();
+            
+            return response()->json([
+                'success' => true,
+                'data' => $methods
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function bayar(Request $request): JsonResponse
     {
-        $idTransaksi = $request->id_transaksi;
-        $idMp = $request->id_mp;
+        try {
+            $user = $request->user();
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not authenticated'
+                ], 401);
+            }
 
-        $trx = Transaksi::where('id_transaksi', $idTransaksi)->first();
-        
-        // Update metode pembayaran dan status jadi paid
-        $trx->update([
-            'id_mp' => $idMp,
-            'status' => 'paid'
-        ]);
+            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'id_transaksi' => 'required|exists:transaksi,id_transaksi',
+                'id_metode_pembayaran' => 'nullable|exists:metode_pembayaran,id_mp'
+            ]);
 
-        return response()->json(['success' => true]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $trx = Transaksi::where('id_transaksi', $request->id_transaksi)
+                ->where('id_user', $user->id_user)
+                ->first();
+
+            if (!$trx) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Transaksi tidak ditemukan'
+                ], 404);
+            }
+
+            $trx->update([
+                'id_mp' => $request->id_metode_pembayaran ?? $trx->id_mp,
+                'status' => 'paid'
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pembayaran berhasil',
+                'data' => $trx
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat pembayaran',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
