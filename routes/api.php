@@ -1,22 +1,17 @@
-    <?php
+<?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DokumenController;
 use App\Http\Controllers\Api\Home\HomeApiController;
-use App\Http\Controllers\Api\Home\KelasApiController;
 use App\Http\Controllers\Api\Home\KeranjangApiController;
 use App\Http\Controllers\Api\Home\TransaksiApiController;
+use App\Http\Controllers\Api\KelasController;
 use App\Http\Controllers\Api\MateriController;
+use App\Http\Controllers\Api\MentorDashboardController;
 use App\Http\Controllers\Api\SubMateriController;
 use App\Http\Controllers\Api\VideoController;
-use App\Http\Controllers\Api\DokumenController;
-use App\Http\Controllers\Api\Mentor\MentorDashboardController;
-use App\Http\Controllers\Api\MentorDashboardController;
-use App\Http\Controllers\Api\Murid\ApiReviewController;
-use App\Http\Controllers\Api\Murid\ApiProgressController;
-use App\Http\Controllers\Api\Murid\ApiReportController;
-use App\Http\Controllers\TransaksiController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 // === PUBLIC ROUTES ===
 Route::post('/register', [AuthController::class, 'register']);
@@ -27,7 +22,7 @@ Route::get('/home', [HomeApiController::class, 'index']);
 
 // === PROTECTED ROUTES (auth:sanctum) ===
 Route::middleware('auth:sanctum')->group(function () {
-    
+
     // Auth endpoints
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/become-mentor', [AuthController::class, 'becomeMentor']);
@@ -43,10 +38,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/transaksi/checkout', [TransaksiApiController::class, 'checkout']);
     Route::get('/transaksi/{id_transaksi}', [TransaksiApiController::class, 'show']);
     Route::post('/transaksi/bayar', [TransaksiApiController::class, 'bayar']);
-    
+
     // Metode Pembayaran endpoints
     Route::get('/metode-pembayaran', [TransaksiApiController::class, 'getPaymentMethods']);
-    
+
     // Kelas endpoints
     Route::get('/kelas', [KelasController::class, 'index']);
     Route::post('/kelas', [KelasController::class, 'store']);
@@ -72,13 +67,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/video/{id_video}', [VideoController::class, 'destroy']);
 
     Route::get('/mentor/dashboard', [MentorDashboardController::class, 'getDashboardSummary']);
-    
+
     // 2. View Detail Keuangan
     Route::get('/mentor/pendapatan', [MentorDashboardController::class, 'getPendapatan']);
-    
+
     // 3. View Detail Review
     Route::get('/mentor/reviews', [MentorDashboardController::class, 'getReviews']);
-    });
 });
 
 /*
