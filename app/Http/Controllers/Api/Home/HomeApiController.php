@@ -18,6 +18,6 @@ class HomeApiController extends Controller
         return response()->json([
             'success' => true,
             'data' => $kelas
-        ]);
+        ], 200);
     }
 }

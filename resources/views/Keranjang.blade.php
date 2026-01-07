@@ -59,7 +59,7 @@
                 </div>
 
                 {{-- PERHATIKAN: Tombol HARUS dibungkus FORM --}}
-                <form action="{{ route('checkout.process') }}" method="POST">
+                <form action="{{ route('checkout.process') }}" method="POST" id="checkoutForm">
                     @csrf
                     
                     {{-- Tambahkan type="submit" agar bisa diklik --}}
@@ -68,6 +68,21 @@
                         Checkout Sekarang
                     </button>
                 </form>
+                
+                <script>
+                    // Debug: Show what's in the cart
+                    console.log('Cart items on page:', {!! json_encode(session()->get('cart', [])) !!});
+                    console.log('Form action:', document.getElementById('checkoutForm').action);
+                    
+                    document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+                        console.log('Form submitted!', {
+                            action: this.action,
+                            method: this.method,
+                            csrfToken: document.querySelector('input[name="_token"]').value,
+                            cartItems: {!! json_encode(session()->get('cart', [])) !!}
+                        });
+                    });
+                </script>
                 </div>
             </div>
         </div>
