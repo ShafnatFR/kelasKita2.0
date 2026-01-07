@@ -148,11 +148,29 @@ Most endpoints require a Bearer Token.
 | `GET` | `/admin/me` | Current Admin Info | - |
 
 **Admin Management:**
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/admin/dashboard` | Admin Dashboard stats |
-| `GET` | `/admin/users` | List Users |
-| `PATCH` | `/admin/users/{id}/status` | Ban/Unban User |
-| `GET` | `/admin/kelas` | List All Classes |
-| `PATCH` | `/admin/kelas/{id}/status` | Approve/Reject Class |
-| `GET` | `/admin/laporan` | Sales Reports |
+| Method | Endpoint | Description | Body / Notes |
+| :--- | :--- | :--- | :--- |
+| **Dashboard** | | | |
+| `GET` | `/admin/dashboard` | Admin Dashboard stats | - |
+| **Users** | | | |
+| `GET` | `/admin/users` | List Users | - |
+| `POST` | `/admin/users` | Create User | `fullname`, `email`, `password`, `role` |
+| `GET` | `/admin/users/{id}` | Detail User | - |
+| `DELETE`| `/admin/users/{id}` | Delete User | - |
+| `PATCH` | `/admin/users/{id}/status` | Ban/Unban User | `status` (active/banned) |
+| `PATCH` | `/admin/users/{id}/catatan`| Update User Notes | `catatan` |
+| `PATCH` | `/admin/users/{id}/activate`| Activate User | - |
+| **Kelas** | | | |
+| `GET` | `/admin/kelas` | List All Classes | - |
+| `GET` | `/admin/kelas/{id}` | Detail Class | - |
+| `DELETE`| `/admin/kelas/{id}` | Delete Class | - |
+| `PATCH` | `/admin/kelas/{id}/status` | Approve/Reject Class | `status` (published/rejected) |
+| `PATCH` | `/admin/kelas/{id}/catatan`| Class Notes | `catatan` |
+| **Laporan (Sales)** | | | |
+| `GET` | `/admin/laporan` | Sales Reports | - |
+| **Reports (Complaints)**| | | |
+| `GET` | `/admin/reports` | List Complaints | - |
+| `GET` | `/admin/reports/{id}` | Detail Complaint | - |
+| `DELETE`| `/admin/reports/{id}` | Delete Complaint | - |
+| `PATCH` | `/admin/reports/{id}/status`| Update Complaint Status | `status` |
+| `PATCH` | `/admin/reports/{id}/catatan`| Complaint Notes | `catatan` |
