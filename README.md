@@ -57,3 +57,102 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+---
+
+## API Documentation (Postman Guide)
+
+This section provides a guide for accessing the API endpoints using Postman.
+
+**Base URL:** `http://localhost:8000/api` (Adjust port if necessary)
+
+**Authentication:**
+Most endpoints require a Bearer Token.
+1.  **Register/Login** to get a token.
+2.  In Postman, go to **Authorization** tab.
+3.  Select **Type**: `Bearer Token`.
+4.  Paste your token.
+
+### 1. Authentication (Public)
+| Method | Endpoint | Description | Body (JSON) |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/register` | Register new user | `fullname`, `email`, `password`, `role` (optional: mentor/student) |
+| `POST` | `/login` | Login user | `email`, `password` |
+
+### 2. User & Profile (Protected)
+| Method | Endpoint | Description | Body (JSON) |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/user` | Get current user info | - |
+| `POST` | `/logout` | Logout user | - |
+| `POST` | `/become-mentor` | Upgrade user to mentor | - |
+
+### 3. Home & Public Data
+| Method | Endpoint | Description | Query Params |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/home` | Get homepage data (latest classes) | - |
+
+### 4. Kelas (Mentor Only)
+| Method | Endpoint | Description | Body / Notes |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/kelas` | List my classes | - |
+| `POST` | `/kelas` | Create new class | `nama_kelas`, `description`, `harga`, `kategori`, `thumbnail` (file) |
+| `GET` | `/kelas/{id}` | Detail class | - |
+| `PUT` | `/kelas/{id}` | Update class | `nama_kelas`, `description`, etc. |
+| `DELETE` | `/kelas/{id}` | Delete class | - |
+
+### 5. Materi (Chapters)
+| Method | Endpoint | Description | Body / Params |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/materi` | List materi by class | `?id_kelas={id}` |
+| `POST` | `/materi` | Add new chapter | `id_kelas`, `judul_materi`, `urutan` |
+| `PUT` | `/materi/{id}` | Update chapter | `judul_materi`, `urutan` |
+| `DELETE`| `/materi/{id}` | Delete chapter | - |
+
+### 6. Sub Materi (Content)
+| Method | Endpoint | Description | Body / Params |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/sub-materi` | List content | `?id_materi={id}` |
+| `POST` | `/sub-materi` | Add content | `id_materi`, `judul`, `tipe` (video/dokumen), `file` or `url` |
+| `PUT` | `/sub-materi/{id}`| Update content | `judul`, `tipe`, etc. |
+| `DELETE`| `/sub-materi/{id}`| Delete content | - |
+
+### 7. Keranjang (Cart)
+| Method | Endpoint | Description | Body (JSON) |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/keranjang` | List items in cart | - |
+| `POST` | `/keranjang` | Add to cart | `id_kelas` |
+| `DELETE`| `/keranjang/{id}` | Remove from cart | - |
+
+### 8. Transaksi & Checkout
+| Method | Endpoint | Description | Body (JSON) |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/metode-pembayaran`| List payment methods | - |
+| `POST` | `/transaksi/checkout`| Create transaction (checkout all cart) | `id_metode_pembayaran` |
+| `POST` | `/checkout` | Process checkout (Legacy) | - |
+| `GET` | `/transaksi/{id}` | Detail transaction | - |
+| `POST` | `/transaksi/bayar` | Pay transaction | `id_transaksi`, `id_metode_pembayaran` |
+
+### 9. Mentor Dashboard
+| Method | Endpoint | Description | Notes |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/mentor/dashboard` | Dashboard summary | Stats cards, recent activity |
+| `GET` | `/mentor/pendapatan`| Revenue report | - |
+| `GET` | `/mentor/reviews` | Student reviews | - |
+
+### 10. Admin Module (Prefix: `/api/admin`)
+**Auth Admin:**
+| Method | Endpoint | Description | Body |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/admin/login` | Admin Login | `email`, `password` |
+| `POST` | `/admin/logout` | Admin Logout | - |
+| `GET` | `/admin/me` | Current Admin Info | - |
+
+**Admin Management:**
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/admin/dashboard` | Admin Dashboard stats |
+| `GET` | `/admin/users` | List Users |
+| `PATCH` | `/admin/users/{id}/status` | Ban/Unban User |
+| `GET` | `/admin/kelas` | List All Classes |
+| `PATCH` | `/admin/kelas/{id}/status` | Approve/Reject Class |
+| `GET` | `/admin/laporan` | Sales Reports |
